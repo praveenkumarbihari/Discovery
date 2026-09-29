@@ -1,0 +1,17 @@
+[
+  {
+    "id": "reddit_01",
+    "source": "Reddit (r/googlephotos)",
+    "raw_text": "I tried finding a picture of a handwritten recipe from 2 years ago. I remembered it was written on blue paper on my kitchen counter, but searching 'recipe' gives me 500 random food photos and zero document results."
+  },
+  {
+    "id": "playstore_02",
+    "source": "Google Play Store",
+    "raw_text": "Search is terrible when you don't know the date. I wanted to show my friend a photo of a cafe we went to right after graduation in Goa. I typed 'Goa cafe' and got hundreds of results from 3 different trips because I couldn't filter by 'summer 2022'."
+  },
+  {
+    "id": "forum_03",
+    "source": "Google Support Community",
+    "raw_text": "I took a screenshot of a medicine prescription last year when I was sick with flu. I can't remember the brand name, so I typed 'medicine', but Google Photos didn't pick up the handwritten text on the bottle label."
+  }
+]

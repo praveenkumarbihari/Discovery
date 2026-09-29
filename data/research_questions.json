@@ -1,0 +1,298 @@
+{
+  "project_title": "Google Photos Search — Discovery Engine (Assignment)",
+  "purpose": "Uncover user problems and insights from public feedback to inform photo search UX and IR design.",
+  "categories": [
+    {
+      "id": "retrieval_targets",
+      "title": "What users struggle to find",
+      "questions": [
+        {
+          "id": "rq_old_photo_types",
+          "question": "What kinds of old photos do users struggle to retrieve (documents, trips, screenshots, pets, casual objects)?",
+          "insight_goal": "Surface photo categories tied to failed or frustrating search.",
+          "example_search_queries": [
+            "can't find old photo google photos",
+            "handwritten note document search wrong results",
+            "screenshot prescription search"
+          ]
+        },
+        {
+          "id": "rq_content_mismatch",
+          "question": "When users search, does the app return the wrong type of content (e.g., food photos instead of documents)?",
+          "insight_goal": "Detect semantic/content-type mismatches in retrieval.",
+          "example_search_queries": [
+            "recipe search shows food not document",
+            "search returns wrong photos"
+          ]
+        },
+        {
+          "id": "rq_buried_in_timeline",
+          "question": "Do users know a photo exists but cannot locate it in a long timeline or backup library?",
+          "insight_goal": "Separate “exists but unfindable” from true zero-result search.",
+          "example_search_queries": [
+            "scroll forever find photo",
+            "thousands of photos can't find one"
+          ]
+        },
+        {
+          "id": "rq_duplicate_near_miss",
+          "question": "Are failures about finding the one correct photo among many similar ones (same place, person, or event)?",
+          "insight_goal": "Highlight evaluation/ranking pain vs wrong-category retrieval.",
+          "example_search_queries": [
+            "too many similar photos search",
+            "same vacation hundreds of results"
+          ]
+        },
+        {
+          "id": "rq_non_photo_assets",
+          "question": "Which non-obvious assets are hard to find: screenshots, scans, receipts, chat exports, memes, PDFs saved as images?",
+          "insight_goal": "Map underserved content types in search indexing.",
+          "example_search_queries": [
+            "find screenshot google photos",
+            "receipt photo search not working"
+          ]
+        },
+        {
+          "id": "rq_people_and_pets",
+          "question": "When users search by person or pet, what goes wrong (wrong face group, missing someone, pets confused with people)?",
+          "insight_goal": "Face/pet clustering failures tied to vague memory queries.",
+          "example_search_queries": [
+            "google photos wrong person group",
+            "find photo of my dog search"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "memory_remembered",
+      "title": "What people remember",
+      "questions": [
+        {
+          "id": "rq_remembered_cues",
+          "question": "What episodic cues do people explicitly remember (time period, place, event, color, object, emotion)?",
+          "insight_goal": "Catalog remembered_clues supported by user wording.",
+          "example_search_queries": [
+            "remember kitchen counter blue paper photo",
+            "photo from trip after graduation"
+          ]
+        },
+        {
+          "id": "rq_visual_vs_verbal",
+          "question": "Do users remember visual/scene cues more than exact names, dates, or words on the photo?",
+          "insight_goal": "Compare visual motifs and locations vs precise keywords.",
+          "example_search_queries": [
+            "remember what room photo was taken",
+            "can't remember date but remember place"
+          ]
+        },
+        {
+          "id": "rq_context_not_keywords",
+          "question": "Do users remember story context (“after surgery”, “first day at job”) that search cannot accept as a query?",
+          "insight_goal": "Expression gaps: rich memory vs poor search vocabulary.",
+          "example_search_queries": [
+            "remember occasion not keyword",
+            "search by memory not date"
+          ]
+        },
+        {
+          "id": "rq_partial_text_memory",
+          "question": "Do users remember fragments of text on a photo (brand, street sign, headline) but not the full string?",
+          "insight_goal": "Partial OCR memory vs exact-match search expectations.",
+          "example_search_queries": [
+            "remember part of sign photo search",
+            "medicine brand name forgot search"
+          ]
+        },
+        {
+          "id": "rq_social_memory",
+          "question": "Who else was in the scene, and does that social cue appear in how users describe the search?",
+          "insight_goal": "People-linked memory without usable face/name filters.",
+          "example_search_queries": [
+            "photo with friend can't find",
+            "family gathering search google photos"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "memory_forgotten",
+      "title": "What people forget",
+      "questions": [
+        {
+          "id": "rq_forgotten_metadata",
+          "question": "What metadata have they forgotten: exact date/year, geotag, album name, filename, or event label?",
+          "insight_goal": "Identify missing metadata that blocks retrieval.",
+          "example_search_queries": [
+            "don't know date google photos search",
+            "forgot album name find photo"
+          ]
+        },
+        {
+          "id": "rq_ocr_text_gap",
+          "question": "Do users forget exact words on labels/receipts but still expect text search to work?",
+          "insight_goal": "Link OCR/handwriting gaps to search failure.",
+          "example_search_queries": [
+            "handwriting search google photos",
+            "medicine label text not found"
+          ]
+        },
+        {
+          "id": "rq_forgotten_capture_context",
+          "question": "Have they forgotten which trip, device, or app captured the photo (WhatsApp vs camera vs screenshot)?",
+          "insight_goal": "Source/album confusion in large libraries.",
+          "example_search_queries": [
+            "whatsapp image find google photos",
+            "which phone photo from"
+          ]
+        },
+        {
+          "id": "rq_forgotten_edit_history",
+          "question": "Do users forget crops, filters, or copies—and search for the wrong version of the image?",
+          "insight_goal": "Duplicate/edited asset confusion.",
+          "example_search_queries": [
+            "edited copy original photo find",
+            "cropped photo can't find original"
+          ]
+        },
+        {
+          "id": "rq_false_certainty",
+          "question": "Do users misremember details (wrong year, wrong city) leading to failed filters or wrong queries?",
+          "insight_goal": "Human memory error vs product failure.",
+          "example_search_queries": [
+            "thought photo was 2019 wrong year",
+            "misremembered location search"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "search_behavior",
+      "title": "How users search with incomplete memory",
+      "questions": [
+        {
+          "id": "rq_search_formulation",
+          "question": "How do users formulate searches when memory is incomplete (single generic word, place only, person name, object noun)?",
+          "insight_goal": "Describe user_search_formulation patterns.",
+          "example_search_queries": [
+            "typed location without date hundreds of results",
+            "single word search google photos"
+          ]
+        },
+        {
+          "id": "rq_unexpressed_clues",
+          "question": "Do users fail because they cannot express remembered cues in the search bar (color, scene, layout)?",
+          "insight_goal": "Separate expression limits from engine interpretation failures.",
+          "example_search_queries": [
+            "can't search by color or scene",
+            "no way to filter blue paper"
+          ]
+        },
+        {
+          "id": "rq_refinement_stuck",
+          "question": "Where do users get stuck narrowing results (date range, trip, map, album, device folder)?",
+          "insight_goal": "Refinement gaps after an overly broad first query.",
+          "example_search_queries": [
+            "filter by summer 2022 trip",
+            "same place multiple visits search"
+          ]
+        },
+        {
+          "id": "rq_workarounds",
+          "question": "What workarounds do users adopt (endless scroll, Google Lens elsewhere, asking others, exporting to Drive)?",
+          "insight_goal": "Pain level and substitute behaviors.",
+          "example_search_queries": [
+            "scroll until find photo google",
+            "google lens instead of photos search"
+          ]
+        },
+        {
+          "id": "rq_multimodal_attempts",
+          "question": "Do users try Ask Photos, voice, or natural-language search—and what breaks in those modes?",
+          "insight_goal": "New modality failures vs classic keyword search.",
+          "example_search_queries": [
+            "ask photos wrong results",
+            "google photos ai search bad"
+          ]
+        },
+        {
+          "id": "rq_query_iteration",
+          "question": "How many query rewrites happen before users give up, and what do they change between attempts?",
+          "insight_goal": "Iterative search behavior under uncertainty.",
+          "example_search_queries": [
+            "tried many searches gave up",
+            "keep changing keywords photos"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "system_failures",
+      "title": "Where the product breaks",
+      "questions": [
+        {
+          "id": "rq_failure_stages",
+          "question": "At which retrieval stage do failures cluster: expression, interpretation, evaluation, or refinement?",
+          "insight_goal": "Aggregate failure_stage patterns across feedback.",
+          "example_search_queries": [
+            "too many results can't find one photo",
+            "search doesn't understand query"
+          ]
+        },
+        {
+          "id": "rq_product_opportunities",
+          "question": "What repeated product opportunities could improve Google Photos search (filters, OCR, ranking, guided prompts)?",
+          "insight_goal": "Synthesize actionable UX/IR improvements.",
+          "example_search_queries": [
+            "google photos search improvement",
+            "better filters face date document"
+          ]
+        },
+        {
+          "id": "rq_trust_and_expectations",
+          "question": "What do users expect search to understand (faces, text, context, memories) vs what it delivers?",
+          "insight_goal": "Expectation gaps and trust breakdowns.",
+          "example_search_queries": [
+            "expected search to find text in photo",
+            "google photos search useless"
+          ]
+        },
+        {
+          "id": "rq_indexing_sync",
+          "question": "Do failures involve indexing lag, backup sync, or missing photos across devices?",
+          "insight_goal": "Infrastructure vs relevance failures.",
+          "example_search_queries": [
+            "photo not backed up yet search",
+            "sync delay google photos find"
+          ]
+        },
+        {
+          "id": "rq_ui_discoverability",
+          "question": "Are features users need (date picker, map, albums, types) hard to discover or removed in UI changes?",
+          "insight_goal": "UX regressions and hidden refinement tools.",
+          "example_search_queries": [
+            "google photos ui update can't find",
+            "removed date scroll photos app"
+          ]
+        },
+        {
+          "id": "rq_privacy_constraints",
+          "question": "Does privacy (locked folders, face groups off, location off) block retrieval users expect to work?",
+          "insight_goal": "Policy/settings vs search capability tension.",
+          "example_search_queries": [
+            "locked folder can't search",
+            "location off search place photos"
+          ]
+        },
+        {
+          "id": "rq_platform_parity",
+          "question": "Do iOS vs Android vs web report different search quality for the same need?",
+          "insight_goal": "Platform-specific retrieval gaps.",
+          "example_search_queries": [
+            "google photos ios search worse",
+            "android vs iphone photos search"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "total_analyzed": 3,
+  "insights": [
+    {
+      "id": "reddit_01",
+      "source": "Reddit (r/googlephotos)",
+      "raw_text": "I tried finding a picture of a handwritten recipe from 2 years ago. I remembered it was written on blue paper on my kitchen counter, but searching 'recipe' gives me 500 random food photos and zero document results.",
+      "target_photo_type": "Document/Receipt/Text",
+      "remembered_clues": [
+        "relative time",
+        "color/visual motif",
+        "broad location"
+      ],
+      "forgotten_metadata": [
+        "exact date/year",
+        "exact OCR text/keyword"
+      ],
+      "user_search_formulation": "broad categorical noun ('recipe') without visual or scene descriptors",
+      "failure_stage": "Interpretation Failure",
+      "opportunity_area": "Improve multimodal intent disambiguation so generic terms like 'recipe' can rank handwritten documents and scene cues (e.g., paper, counter) alongside food imagery."
+    },
+    {
+      "id": "playstore_02",
+      "source": "Google Play Store",
+      "raw_text": "Search is terrible when you don't know the date. I wanted to show my friend a photo of a cafe we went to right after graduation in Goa. I typed 'Goa cafe' and got hundreds of results from 3 different trips because I couldn't filter by 'summer 2022'.",
+      "target_photo_type": "Personal Event/Trip",
+      "remembered_clues": [
+        "relative time",
+        "co-occurring event",
+        "broad location"
+      ],
+      "forgotten_metadata": [
+        "exact date/year",
+        "exact location tag/geotag"
+      ],
+      "user_search_formulation": "location keyword without date ('Goa cafe')",
+      "failure_stage": "Refinement Failure",
+      "opportunity_area": "Surface natural-language temporal filters (e.g., 'summer 2022') and trip/event groupings immediately after location queries to disambiguate repeat visits."
+    },
+    {
+      "id": "forum_03",
+      "source": "Google Support Community",
+      "raw_text": "I took a screenshot of a medicine prescription last year when I was sick with flu. I can't remember the brand name, so I typed 'medicine', but Google Photos didn't pick up the handwritten text on the bottle label.",
+      "target_photo_type": "Screenshot/Digital Asset",
+      "remembered_clues": [
+        "relative time",
+        "emotion/context"
+      ],
+      "forgotten_metadata": [
+        "exact OCR text/keyword"
+      ],
+      "user_search_formulation": "single generic tag ('medicine') without label or prescription text",
+      "failure_stage": "Interpretation Failure",
+      "opportunity_area": "Strengthen OCR and handwriting retrieval on screenshots so partial health-related queries match visible label and prescription text even when brand names are unknown."
+    }
+  ],
+  "summary_metrics": {
+    "failure_stage_counts": {
+      "Expression Failure": 0,
+      "Interpretation Failure": 2,
+      "Evaluation Failure": 0,
+      "Refinement Failure": 1
+    },
+    "top_remembered_clues": [
+      { "clue": "relative time", "count": 3 },
+      { "clue": "broad location", "count": 2 },
+      { "clue": "co-occurring event", "count": 1 },
+      { "clue": "color/visual motif", "count": 1 },
+      { "clue": "emotion/context", "count": 1 }
+    ],
+    "top_forgotten_metadata": [
+      { "metadata": "exact date/year", "count": 2 },
+      { "metadata": "exact OCR text/keyword", "count": 2 },
+      { "metadata": "exact location tag/geotag", "count": 1 }
+    ]
+  },
+  "research_insights": [
+    {
+      "question_id": "rq_old_photo_types",
+      "question": "What kinds of old photos do users struggle to retrieve?",
+      "finding": "Users struggle with documents/handwritten text, trip/event photos, and screenshots—often tied to older captures where metadata and labels are fuzzy.",
+      "supporting_ids": ["reddit_01", "playstore_02", "forum_03"],
+      "confidence": "high"
+    },
+    {
+      "question_id": "rq_remembered_cues",
+      "question": "What information do people actually remember about a photo?",
+      "finding": "Relative time, broad location, and co-occurring events dominate; visual motifs (e.g., blue paper) appear when users recall scene detail.",
+      "supporting_ids": ["reddit_01", "playstore_02", "forum_03"],
+      "confidence": "high"
+    },
+    {
+      "question_id": "rq_forgotten_metadata",
+      "question": "What information have they forgotten (date, location tag, album, text on photo)?",
+      "finding": "Exact dates and OCR keywords are frequently missing, forcing vague queries and ambiguous result sets.",
+      "supporting_ids": ["reddit_01", "playstore_02", "forum_03"],
+      "confidence": "high"
+    },
+    {
+      "question_id": "rq_search_formulation",
+      "question": "How do users formulate searches when their memory is incomplete?",
+      "finding": "Users rely on broad nouns, location-only queries, and generic tags instead of combining time, scene, and content-type cues.",
+      "supporting_ids": ["reddit_01", "playstore_02", "forum_03"],
+      "confidence": "high"
+    },
+    {
+      "question_id": "rq_failure_stages",
+      "question": "At which retrieval stage do failures cluster: expression, interpretation, evaluation, or refinement?",
+      "finding": "Interpretation and refinement failures dominate—wrong content types/OCR gaps plus inability to narrow multi-trip location results.",
+      "supporting_ids": ["reddit_01", "playstore_02", "forum_03"],
+      "confidence": "high"
+    }
+  ]
+}

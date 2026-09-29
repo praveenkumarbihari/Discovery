@@ -1,0 +1,25 @@
+FAILURE STAGE DECISION (apply in this order; pick the FIRST stage that applies):
+
+1. Expression Failure — The user remembers episodic cues (place, object, scene, color) that the search bar cannot express, AND they did not (or could not) translate memory into searchable keywords. The bottleneck is formulation, not the engine response.
+
+2. Interpretation Failure — The user issued a plausible keyword query, but the system retrieved the wrong semantic content type, ignored visible text (OCR/handwriting), or failed multimodal/scene matching. Symptoms: "wrong kind of photos", "didn't pick up text", "zero document results" while a content-type mismatch is the core issue.
+
+3. Evaluation Failure — The query likely surfaced relevant items somewhere in a large, undifferentiated result set, but ranking and scanning UI make finding the target impractical. Symptoms: huge volume of similar results with no way to distinguish the one target photo among many same-category hits. Do NOT use when the user reports zero matches of the needed type.
+
+4. Refinement Failure — Initial results are broadly on-topic but ambiguous across time, trips, or events; the user needs progressive filters (date, trip, event) that are missing or undiscoverable after the first query.
+
+CANONICAL VALUES (use exact strings only):
+- remembered_clues: "relative time" | "color/visual motif" | "emotion/context" | "co-occurring event" | "broad location"
+- forgotten_metadata: "exact date/year" | "exact location tag/geotag" | "exact OCR text/keyword" | "album name/file name"
+
+RULES:
+- Echo each input post's id, source, and raw_text verbatim in the matching insight.
+- Output one insight per input post, same order as input.
+- Only tag remembered_clues explicitly supported by the user's wording; do not infer clues they did not state.
+- forgotten_metadata is REQUIRED (minimum 1 canonical value) for any post about search, find, or retrieval struggle. Tag what the user could not supply but the product would need (date, geotag, OCR text, album/file). Use exact rubric strings only.
+- Set total_analyzed to the input count; compute summary_metrics from your insights (counts must match).
+
+CALIBRATION EXAMPLES (for consistency):
+- Handwritten recipe on blue paper; search "recipe" → food photos, no documents → Interpretation Failure (wrong content-type retrieval).
+- "Goa cafe" after graduation; hundreds across trips; cannot filter summer 2022 → Refinement Failure (needs temporal/event narrowing).
+- Screenshot of prescription; search "medicine"; OCR/handwriting on label not found → Interpretation Failure (text/index mismatch).

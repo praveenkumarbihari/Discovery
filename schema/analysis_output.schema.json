@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://discovery-engine.local/schema/analysis_output.schema.json",
+  "title": "Google Photos Discovery Analysis Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["total_analyzed", "insights", "summary_metrics", "research_insights"],
+  "properties": {
+    "total_analyzed": { "type": "integer", "minimum": 0 },
+    "insights": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/insight" }
+    },
+    "summary_metrics": { "$ref": "#/$defs/summary_metrics" },
+    "research_insights": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/research_insight" }
+    }
+  },
+  "$defs": {
+    "target_photo_type": {
+      "type": "string",
+      "enum": [
+        "Document/Receipt/Text",
+        "Personal Event/Trip",
+        "Casual Object/Background Item",
+        "Specific Person/Pet",
+        "Screenshot/Digital Asset"
+      ]
+    },
+    "failure_stage": {
+      "type": "string",
+      "enum": [
+        "Expression Failure",
+        "Interpretation Failure",
+        "Evaluation Failure",
+        "Refinement Failure"
+      ]
+    },
+    "insight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "raw_text",
+        "target_photo_type",
+        "remembered_clues",
+        "forgotten_metadata",
+        "user_search_formulation",
+        "failure_stage",
+        "opportunity_area"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "source": { "type": "string" },
+        "raw_text": { "type": "string" },
+        "target_photo_type": { "$ref": "#/$defs/target_photo_type" },
+        "remembered_clues": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "forgotten_metadata": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "user_search_formulation": { "type": "string" },
+        "failure_stage": { "$ref": "#/$defs/failure_stage" },
+        "opportunity_area": { "type": "string" }
+      }
+    },
+    "research_insight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question_id", "question", "finding", "supporting_ids", "confidence"],
+      "properties": {
+        "question_id": { "type": "string" },
+        "question": { "type": "string" },
+        "finding": { "type": "string" },
+        "supporting_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["high", "medium", "low"]
+        }
+      }
+    },
+    "summary_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "failure_stage_counts",
+        "top_remembered_clues",
+        "top_forgotten_metadata"
+      ],
+      "properties": {
+        "failure_stage_counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "Expression Failure",
+            "Interpretation Failure",
+            "Evaluation Failure",
+            "Refinement Failure"
+          ],
+          "properties": {
+            "Expression Failure": { "type": "integer", "minimum": 0 },
+            "Interpretation Failure": { "type": "integer", "minimum": 0 },
+            "Evaluation Failure": { "type": "integer", "minimum": 0 },
+            "Refinement Failure": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "top_remembered_clues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["clue", "count"],
+            "properties": {
+              "clue": { "type": "string" },
+              "count": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "top_forgotten_metadata": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["metadata", "count"],
+            "properties": {
+              "metadata": { "type": "string" },
+              "count": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

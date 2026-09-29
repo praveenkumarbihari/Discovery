@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+  <head>
+
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta http-equiv="Cache-Control" content="no-cache" />
+
+    <title>Discovery Engine</title>
+
+    <link rel="stylesheet" href="/static/app.css?v=15" />
+
+  </head>
+
+  <body class="mode-landing">
+
+    <header class="header header-minimal">
+
+      <div class="header-inner header-with-nav">
+
+        <button type="button" id="btn-home" class="brand-mark" title="Back to home">
+
+          Discovery Engine
+
+        </button>
+
+        <span class="header-tagline">Live web scrape — no local database</span>
+
+        <span id="model-label" class="model-label"></span>
+
+      </div>
+
+    </header>
+
+
+
+    <main class="layout">
+
+      <section id="landing" class="landing">
+
+        <h1 class="landing-title">Search the web for Google Photos search struggles</h1>
+
+        <p class="landing-sub">
+
+          Crawls public sources on each search (Stack Exchange, Hacker News, Play Store, Reddit).
+
+          Results are not saved to DuckDB — select posts and analyze in memory.
+
+        </p>
+
+
+
+        <section class="research-framework" id="research-framework" aria-label="Research questions">
+
+          <h2 class="framework-title">Discovery questions this engine helps uncover</h2>
+
+          <p class="framework-sub">
+
+            Five themes, 28 clarifying questions — expand each section to explore what to look for in
+
+            live web feedback.
+
+          </p>
+
+          <div id="research-categories" class="research-categories"></div>
+
+          <div class="suggested-searches">
+
+            <span class="suggested-label">Try searching:</span>
+
+            <div id="suggested-chips" class="suggested-chips"></div>
+
+          </div>
+
+        </section>
+
+
+
+        <form id="discover-form" class="search-form">
+
+          <div class="search-bar">
+
+            <input
+
+              type="search"
+
+              id="discover-query"
+
+              placeholder="e.g. can't find old photo in Google Photos search"
+
+              autocomplete="off"
+
+              aria-label="Search topic"
+
+            />
+
+            <button type="submit" id="btn-discover" class="btn btn-search">Search web</button>
+
+          </div>
+
+
+
+          <details class="search-options">
+
+            <summary>Sources &amp; limits</summary>
+
+            <fieldset class="discover-sources" id="discover-sources">
+
+              <legend>Sources</legend>
+
+              <label class="source-check">
+
+                <input type="checkbox" name="discover-source" value="stackexchange" checked />
+
+                Stack Exchange Q&amp;A
+
+              </label>
+
+              <label class="source-check">
+
+                <input type="checkbox" name="discover-source" value="hackernews" checked />
+
+                Hacker News
+
+              </label>
+
+              <label class="source-check">
+
+                <input type="checkbox" name="discover-source" value="playstore" checked />
+
+                Google Play reviews
+
+              </label>
+
+              <label class="source-check">
+
+                <input type="checkbox" name="discover-source" value="reddit" checked />
+
+                Reddit (public JSON)
+
+              </label>
+
+            </fieldset>
+
+            <label class="field limit-field">
+
+              <span>Max results (after relevance filter)</span>
+
+              <select id="discover-limit">
+
+                <option value="12">12</option>
+
+                <option value="24" selected>24</option>
+
+                <option value="40">40</option>
+
+                <option value="50">50</option>
+
+              </select>
+
+            </label>
+
+          </details>
+
+        </form>
+
+      </section>
+
+
+
+      <section id="results-view" class="results-view hidden" aria-live="polite">
+
+        <form id="discover-form-compact" class="search-form search-form-compact">
+
+          <div class="search-bar">
+
+            <input
+
+              type="search"
+
+              id="discover-query-compact"
+
+              autocomplete="off"
+
+              aria-label="Search topic"
+
+            />
+
+            <button type="submit" class="btn btn-search">Search web</button>
+
+          </div>
+
+        </form>
+
+
+
+        <p id="serp-stats" class="serp-stats"></p>
+
+        <div id="serp-results" class="serp-results"></div>
+
+
+
+        <div class="serp-actions">
+
+          <button type="button" id="btn-select-all" class="btn btn-ghost">Select all</button>
+
+          <button type="button" id="btn-select-none" class="btn btn-ghost">Clear</button>
+
+          <button type="button" id="btn-analyze" class="btn btn-primary" disabled>
+
+            Analyze selected
+
+          </button>
+
+        </div>
+
+
+
+        <p id="form-hint" class="form-hint hidden" role="status"></p>
+
+      </section>
+
+
+
+      <section class="panel insights-panel hidden" id="insights-section">
+
+        <div class="panel-head">
+
+          <h2>Analysis</h2>
+
+          <span id="total-badge" class="badge badge-accent"></span>
+
+        </div>
+
+        <div class="mini-panel research-answers-panel">
+
+          <h3>Research insights (assignment synthesis)</h3>
+
+          <div id="research-insights" class="research-insights"></div>
+
+        </div>
+
+
+
+        <div class="metrics" id="metrics"></div>
+
+        <div class="two-col">
+
+          <div class="mini-panel">
+
+            <h3>Top remembered clues</h3>
+
+            <ul id="clues-list" class="rank-list"></ul>
+
+          </div>
+
+          <div class="mini-panel">
+
+            <h3>Top forgotten metadata</h3>
+
+            <ul id="forgotten-list" class="rank-list"></ul>
+
+          </div>
+
+        </div>
+
+        <div id="insights" class="insights"></div>
+
+      </section>
+
+
+
+      <section class="panel error-panel hidden" id="error-section">
+
+        <h2>Something went wrong</h2>
+
+        <pre id="error-text"></pre>
+
+      </section>
+
+    </main>
+
+
+
+    <div id="overlay" class="overlay hidden" aria-live="polite">
+
+      <div class="spinner"></div>
+
+      <p id="overlay-text">Searching…</p>
+
+    </div>
+
+
+
+    <script src="/static/app.js?v=16"></script>
+
+  </body>
+
+</html>
+
+

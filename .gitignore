@@ -1,0 +1,15 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+out/
+data/cache/
+data/raw/
+data/engine.duckdb
+data/engine.duckdb.wal
+.pytest_cache/
+tools/ngrok/ngrok.exe
+tools/ngrok/ngrok.zip
+*.duckdb
+*.duckdb.wal

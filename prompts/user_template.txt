@@ -1,0 +1,78 @@
+Analyze the following user feedback posts regarding photo search and retrieval struggles.
+
+Classification rubric (follow exactly):
+{{RUBRIC}}
+
+Assignment research framework (synthesize after per-post classification):
+{{RESEARCH_QUESTIONS}}
+
+Input Data ({{POST_COUNT}} posts):
+{{INPUT_JSON}}
+
+Perform the following structured classification for each post in the input array:
+
+1. "target_photo_type": Categorize the requested photo into ONE of the following categories:
+   - "Document/Receipt/Text"
+   - "Personal Event/Trip"
+   - "Casual Object/Background Item"
+   - "Specific Person/Pet"
+   - "Screenshot/Digital Asset"
+
+2. "remembered_clues": Array of canonical primitives the user EXPLICITLY stated (see rubric). No paraphrased labels.
+
+3. "forgotten_metadata": Non-empty array of canonical metadata types the user could not recall or did not use in search (see rubric). Always include at least one value when the post mentions finding/searching photos.
+
+4. "user_search_formulation": Describe the search syntax or strategy the user attempted (e.g., "broad categorical noun", "location keyword without date", "single generic tag").
+
+5. "failure_stage": Map the primary failure point to EXACTLY ONE stage of the retrieval funnel:
+   - "Expression Failure": The user cannot express their episodic memory in keywords supported by the search bar.
+   - "Interpretation Failure": The search engine misinterprets the user's keywords or fails to perform semantic/multimodal matching.
+   - "Evaluation Failure": Search returns too many results without clear UI sorting/scanning capabilities.
+   - "Refinement Failure": The user gets stuck after an initial query because there are no guided filters or progressive prompts to narrow results down.
+
+6. "opportunity_area": Write a 1-sentence product opportunity statement detailing how Google Photos could bridge this gap.
+
+7. Batch synthesis — populate "research_insights" (minimum 6 items, up to 12) answering applicable framework questions using ONLY this batch. Prefer breadth across the five themes (struggle to find, remember, forget, search behavior, product breaks).
+   Each item: question_id (from framework), question (verbatim), finding (2–4 sentences), supporting_ids (post ids), confidence ("high"|"medium"|"low").
+
+Return a single JSON object structured EXACTLY as follows (set total_analyzed to {{POST_COUNT}}):
+
+{
+  "total_analyzed": {{POST_COUNT}},
+  "insights": [
+    {
+      "id": "string",
+      "source": "string",
+      "raw_text": "string",
+      "target_photo_type": "string",
+      "remembered_clues": ["string"],
+      "forgotten_metadata": ["string"],
+      "user_search_formulation": "string",
+      "failure_stage": "string",
+      "opportunity_area": "string"
+    }
+  ],
+  "summary_metrics": {
+    "failure_stage_counts": {
+      "Expression Failure": 0,
+      "Interpretation Failure": 0,
+      "Evaluation Failure": 0,
+      "Refinement Failure": 0
+    },
+    "top_remembered_clues": [
+      { "clue": "string", "count": 0 }
+    ],
+    "top_forgotten_metadata": [
+      { "metadata": "string", "count": 0 }
+    ]
+  },
+  "research_insights": [
+    {
+      "question_id": "rq_old_photo_types",
+      "question": "string",
+      "finding": "string",
+      "supporting_ids": ["string"],
+      "confidence": "high"
+    }
+  ]
+}

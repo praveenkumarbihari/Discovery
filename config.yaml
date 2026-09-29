@@ -1,0 +1,87 @@
+project:
+  name: google-photos-vague-memory-discovery
+  prompt_version: "1.0.0"
+
+collection:
+  # all = keep every deduped review/post; keyword_filtered = only rows matching terms below
+  store_mode: all
+  min_words: 8
+  play_store:
+    app_id: com.google.android.apps.photos
+    countries: [in, us, gb, ca, au, de]
+    per_sort_limit: 1000
+    sorts: [newest, relevant, rating]
+  app_store:
+    app_id: "962194608"
+    countries: [in, us, gb, ca, au]
+    max_pages: 50
+  reddit:
+    subreddits:
+      - googlephotos
+      - GooglePixel
+      - androidapps
+      - pixel_phones
+      - tipofmytongue
+      - google
+      - photography
+    search_queries:
+      - "can't find photo"
+      - search photos
+      - find old photo
+      - google photos search
+      - screenshot find
+      - ask photos
+      - photo search broken
+      - can't find screenshot
+      - find picture
+    request_delay_seconds: 1.5
+    limit_per_query: 100
+    pages_per_query: 3
+  keyword_filter:
+    terms:
+      - can't find
+      - cannot find
+      - couldn't find
+      - search
+      - searching
+      - find a photo
+      - find the photo
+      - remember
+      - scroll
+      - scrolling
+      - years ago
+      - old photo
+      - screenshot
+      - lost photo
+      - where is
+      - ask photos
+      - face group
+      - people and pets
+      - location
+      - date
+      - album
+      - receipt
+      - document
+      - bill
+      - prescription
+
+llm:
+  cheap_model: openai/gpt-4o-mini
+  strong_model: openai/gpt-4o
+  max_concurrency: 5
+  cache_dir: data/cache/llm
+
+scoring:
+  weights:
+    frequency: 0.25
+    severity: 0.20
+    not_found_rate: 0.20
+    workaround_pain: 0.15
+    cue_gap: 0.15
+    stakes: 0.05
+  min_cell_n: 10
+
+paths:
+  duckdb: data/engine.duckdb
+  raw_dir: data/raw
+  processed_dir: data/processed

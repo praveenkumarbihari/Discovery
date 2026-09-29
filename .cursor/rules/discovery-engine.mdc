@@ -1,0 +1,10 @@
+---
+description: Google Photos vague-memory Discovery Engine assignment spec
+alwaysApply: true
+---
+
+Follow `Discovery_Engine_Cursor_Prompt.md` (master prompt): 6-stage retrieval funnel, Pydantic schemas in `engine/models.py`, DuckDB + Parquet pipeline, evidence-first quotes, Streamlit target app.
+
+Prefer extending `engine/` CLI over rewriting working `src/web_app.py` unless migrating a feature.
+
+See `DECISIONS.md` for gap priorities and `config.yaml` for sources/weights.
