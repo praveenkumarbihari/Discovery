@@ -28,14 +28,26 @@ gh repo create google-photos-discovery-engine --private --source=. --remote=orig
 
 Your repo URL will be printed (e.g. `https://github.com/YOUR_USER/discovery-engine`).
 
+## SSH error: `Permission denied (publickey)`
+
+If you added the remote as `git@github.com:USER/REPO.git`, Git uses SSH keys. Either [add an SSH key to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh) **or** switch to HTTPS (recommended on Windows):
+
+```powershell
+cd "d:\PM\Discovery Engine"
+git remote set-url origin https://github.com/YOUR_USER/REPO.git
+git push -u origin main
+```
+
+Git Credential Manager will open a browser sign-in for GitHub.
+
 ## Manual alternative (no gh)
 
-1. On https://github.com/new create an empty repo **discovery-engine** (no README).
+1. On https://github.com/new create an empty repo (no README).
 2. Then:
 
 ```powershell
 cd "d:\PM\Discovery Engine"
-git remote add origin https://github.com/YOUR_USER/discovery-engine.git
+git remote add origin https://github.com/YOUR_USER/REPO.git
 git push -u origin main
 ```
 
