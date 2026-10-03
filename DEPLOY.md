@@ -1,21 +1,47 @@
-# Deploy Discovery Engine on a Linux VPS
+# Deploy Discovery Engine on your VPS (praveen / srv1519052)
 
-Target layout: **`~/projects/discovery-engine`** (or `/home/<user>/projects/discovery-engine`).
+This guide matches your site layout:
 
-The web UI is **live scrape only** (no DuckDB required). It listens on **port 8765** behind **nginx** on ports 80/443.
+| Path | Purpose |
+|------|---------|
+| `/var/www/mysite/` | Main site (`index.html`, `assets/`) |
+| `/var/www/mysite/projects/` | Project apps (`SSM`, `VO2`, `vivah mcp`, `webOss`, …) |
+| **`/var/www/mysite/projects/Discovery`** | **This app** (clone from GitHub) |
+
+- **Repo:** [github.com/praveenkumarbihari/Discovery](https://github.com/praveenkumarbihari/Discovery)
+- **Process:** FastAPI on **`127.0.0.1:8765`** (live web scrape + LLM analyze; no DuckDB required for the UI)
+- **Public URL (recommended):** `https://YOUR_DOMAIN/projects/discovery/` on the same nginx vhost as `mysite`
 
 ---
 
-## 1. VPS prerequisites
+## Quick checklist
 
-Ubuntu 22.04/24.04 (or similar):
+1. Clone into `/var/www/mysite/projects/Discovery`
+2. Create `.venv`, `pip install -r requirements.txt`
+3. Copy `.env` with LLM keys + `DISCOVERY_BASE_PATH` + `OPENROUTER_HTTP_REFERER`
+4. Test with `curl http://127.0.0.1:8765/api/health`
+5. Add **systemd** unit `discovery-engine.service`
+6. Add **nginx** `location /projects/discovery/` to your existing `mysite` server block
+7. Reload nginx; open the public URL; hard-refresh (`Ctrl+F5`) after updates
+
+---
+
+## 1. Prerequisites (on the VPS)
+
+SSH as `praveen@srv1519052`:
 
 ```bash
 sudo apt update
-sudo apt install -y python3 python3-venv python3-pip git nginx
+sudo apt install -y python3 python3-venv python3-pip git
 ```
 
-Optional HTTPS:
+`nginx` is likely already installed for `/var/www/mysite`. If not:
+
+```bash
+sudo apt install -y nginx
+```
+
+HTTPS (if not already on the main site):
 
 ```bash
 sudo apt install -y certbot python3-certbot-nginx
@@ -23,33 +49,33 @@ sudo apt install -y certbot python3-certbot-nginx
 
 ---
 
-## 2. Copy the project to `~/projects`
-
-**Option A — Git (recommended if you have a remote):**
+## 2. Clone the repo
 
 ```bash
-mkdir -p ~/projects
-cd ~/projects
-git clone <YOUR_REPO_URL> discovery-engine
-cd discovery-engine
+cd /var/www/mysite/projects
+git clone https://github.com/praveenkumarbihari/Discovery.git Discovery
+cd Discovery
 ```
 
-**Option B — From your PC (rsync over SSH):**
+If the folder already exists, update instead:
 
 ```bash
-# Run on your Windows PC (Git Bash / WSL), adjust user and VPS IP
-rsync -avz --exclude .venv --exclude __pycache__ --exclude data/engine.duckdb \
-  "/d/PM/Discovery Engine/" user@YOUR_VPS_IP:~/projects/discovery-engine/
+cd /var/www/mysite/projects/Discovery
+git pull origin main
 ```
 
-**Option C — Zip upload:** zip the folder (without `.venv`), upload via SFTP, unzip under `~/projects/discovery-engine`.
+Ensure `praveen` can write here (for `.venv` and optional cache):
+
+```bash
+sudo chown -R praveen:praveen /var/www/mysite/projects/Discovery
+```
 
 ---
 
-## 3. Python environment
+## 3. Python virtual environment
 
 ```bash
-cd ~/projects/discovery-engine
+cd /var/www/mysite/projects/Discovery
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
@@ -58,31 +84,34 @@ pip install -r requirements.txt
 
 ---
 
-## 4. Environment variables
+## 4. Environment (`.env`)
 
 ```bash
 cp .env.example .env
 nano .env
 ```
 
-Set at least one LLM provider:
+**Required (at least one LLM):**
 
 ```env
 OPENROUTER_API_KEY=sk-or-...
 OPENROUTER_MODEL=openai/gpt-4o-mini
+```
 
-# optional fallback
+**Optional fallback:**
+
+```env
 GEMINI_API_KEY=...
 ```
 
-For production, set OpenRouter referer to your public URL:
+**Production (set to your real public URL):**
 
 ```env
-OPENROUTER_HTTP_REFERER=https://your-domain.com
+OPENROUTER_HTTP_REFERER=https://YOUR_DOMAIN/projects/discovery/
 OPENROUTER_APP_TITLE=Google Photos Discovery Engine
 ```
 
-Lock down permissions:
+Lock permissions:
 
 ```bash
 chmod 600 .env
@@ -90,46 +119,51 @@ chmod 600 .env
 
 ---
 
-## 5. Test run (manual)
+## 5. Manual test (before systemd)
 
 ```bash
-cd ~/projects/discovery-engine
+cd /var/www/mysite/projects/Discovery
 source .venv/bin/activate
+export DISCOVERY_BASE_PATH=/projects/discovery/
 python3 -m uvicorn src.web_app:app --host 127.0.0.1 --port 8765
 ```
 
-On the VPS:
+In another SSH session:
 
 ```bash
 curl -s http://127.0.0.1:8765/api/health
 ```
 
-From your laptop (SSH tunnel, no nginx yet):
+Expect JSON with `"ok": true`. Stop the test with `Ctrl+C`.
+
+**From your laptop (no nginx yet):**
 
 ```bash
-ssh -L 8765:127.0.0.1:8765 user@YOUR_VPS_IP
-# then open http://127.0.0.1:8765 on your PC
+ssh -L 8765:127.0.0.1:8765 praveen@srv1519052
 ```
 
-Stop the test with `Ctrl+C`.
+Open `http://127.0.0.1:8765/` on your PC.
 
 ---
 
-## 6. systemd service (always on)
+## 6. systemd (always on)
 
 Create `/etc/systemd/system/discovery-engine.service`:
 
 ```ini
 [Unit]
-Description=Discovery Engine (FastAPI)
+Description=Google Photos Discovery Engine (FastAPI)
 After=network.target
 
 [Service]
 Type=simple
-User=YOUR_LINUX_USER
-WorkingDirectory=/home/YOUR_LINUX_USER/projects/discovery-engine
-Environment=PATH=/home/YOUR_LINUX_USER/projects/discovery-engine/.venv/bin
-ExecStart=/home/YOUR_LINUX_USER/projects/discovery-engine/.venv/bin/python -m uvicorn src.web_app:app --host 127.0.0.1 --port 8765
+User=praveen
+Group=praveen
+WorkingDirectory=/var/www/mysite/projects/Discovery
+Environment=PATH=/var/www/mysite/projects/Discovery/.venv/bin
+Environment=DISCOVERY_BASE_PATH=/projects/discovery/
+EnvironmentFile=/var/www/mysite/projects/Discovery/.env
+ExecStart=/var/www/mysite/projects/Discovery/.venv/bin/python -m uvicorn src.web_app:app --host 127.0.0.1 --port 8765
 Restart=on-failure
 RestartSec=5
 
@@ -137,28 +171,83 @@ RestartSec=5
 WantedBy=multi-user.target
 ```
 
-Replace `YOUR_LINUX_USER` with your login (e.g. `ubuntu`).
+Enable and start:
 
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable discovery-engine
 sudo systemctl start discovery-engine
 sudo systemctl status discovery-engine
+```
+
+Logs:
+
+```bash
 journalctl -u discovery-engine -f
 ```
 
 ---
 
-## 7. nginx reverse proxy
+## 7. nginx — subpath under `mysite` (recommended)
 
-Create `/etc/nginx/sites-available/discovery-engine`:
+Do **not** expose port **8765** on the public firewall. Only nginx talks to the app.
+
+Find the server block that serves `/var/www/mysite` (often `/etc/nginx/sites-enabled/default` or a custom `mysite` file):
+
+```bash
+sudo nginx -T 2>/dev/null | grep -E "root /var/www/mysite|server_name"
+```
+
+Inside that `server { ... }` block, **add** (keep your existing `root` and `location /` for the main site):
+
+```nginx
+    # Discovery Engine — sibling to other projects under /projects/
+    location /projects/discovery/ {
+        proxy_pass http://127.0.0.1:8765/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+        client_max_body_size 4m;
+    }
+```
+
+Reload:
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+**Public URL:** `https://YOUR_DOMAIN/projects/discovery/`  
+(Replace `YOUR_DOMAIN` with the hostname you already use for `mysite`.)
+
+**Link from your portfolio:** add a card on `index.html` pointing to `/projects/discovery/` (same pattern as `webOss`, etc.).
+
+### Optional: redirect without trailing slash
+
+```nginx
+    location = /projects/discovery {
+        return 301 /projects/discovery/;
+    }
+```
+
+---
+
+## 8. Alternative: subdomain (simpler URLs)
+
+If you prefer `https://discovery.YOUR_DOMAIN/` instead of a subpath:
+
+1. DNS **A record** → your VPS IP  
+2. New server block:
 
 ```nginx
 server {
     listen 80;
-    server_name YOUR_DOMAIN_OR_VPS_IP;
-
-    client_max_body_size 4m;
+    server_name discovery.YOUR_DOMAIN;
 
     location / {
         proxy_pass http://127.0.0.1:8765;
@@ -173,25 +262,15 @@ server {
 }
 ```
 
-Enable and reload:
-
-```bash
-sudo ln -sf /etc/nginx/sites-available/discovery-engine /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
-```
-
-Open **`http://YOUR_VPS_IP`** (or your domain) in a browser.
-
-**HTTPS (with a domain):**
-
-```bash
-sudo certbot --nginx -d your-domain.com
-```
+3. Remove `DISCOVERY_BASE_PATH` from the systemd unit (or leave it unset).  
+4. Set `OPENROUTER_HTTP_REFERER=https://discovery.YOUR_DOMAIN/` in `.env`.  
+5. `sudo certbot --nginx -d discovery.YOUR_DOMAIN`
 
 ---
 
-## 8. Firewall
+## 9. Firewall
+
+If you use UFW:
 
 ```bash
 sudo ufw allow OpenSSH
@@ -199,16 +278,18 @@ sudo ufw allow 'Nginx Full'
 sudo ufw enable
 ```
 
-Do **not** expose port 8765 publicly if nginx is in front (keep app on `127.0.0.1` only).
+Port **8765** should stay bound to **127.0.0.1** only (default in this guide).
 
 ---
 
-## 9. Updates after code changes
+## 10. Deploy updates
+
+On the VPS:
 
 ```bash
-cd ~/projects/discovery-engine
+cd /var/www/mysite/projects/Discovery
+git pull origin main
 source .venv/bin/activate
-git pull   # or rsync again
 pip install -r requirements.txt
 sudo systemctl restart discovery-engine
 ```
@@ -217,23 +298,42 @@ Hard refresh the browser (`Ctrl+F5`) after static file changes.
 
 ---
 
-## 10. Troubleshooting
+## 11. Troubleshooting
 
-| Issue | What to check |
-|--------|----------------|
-| Analyze fails | `.env` keys, `journalctl -u discovery-engine` |
-| Discover returns nothing | Reddit/Play may block datacenter IPs; try Stack Exchange + HN only |
-| 502 from nginx | `systemctl status discovery-engine`, port 8765 listening |
-| Slow analyze | Normal for many rows; nginx timeouts set to 300s above |
+| Symptom | What to do |
+|--------|------------|
+| Blank page / 404 on CSS or JS | Confirm `DISCOVERY_BASE_PATH=/projects/discovery/` in systemd; nginx `location` must end with `/` and `proxy_pass` must be `http://127.0.0.1:8765/` |
+| 502 Bad Gateway | `sudo systemctl status discovery-engine`; `curl http://127.0.0.1:8765/api/health` |
+| Analyze fails | Check `.env` keys; `journalctl -u discovery-engine -n 100` |
+| Discover returns few/zero rows | Reddit often blocks datacenter IPs; Stack Exchange + HN + Play Store usually still work |
+| Slow analyze | Normal for many rows; nginx timeouts are 300s above |
 
-**Logs:**
+**Health check through nginx:**
 
 ```bash
-journalctl -u discovery-engine -n 100 --no-pager
+curl -s https://YOUR_DOMAIN/projects/discovery/api/health
 ```
 
 ---
 
-## Optional: run on a subpath
+## 12. Optional CLI (DuckDB corpus)
 
-If the app must live at `https://example.com/projects/discovery/` you need a reverse-proxy path strip and possibly FastAPI `root_path` — simpler to use a subdomain (`discovery.example.com`) or dedicated port behind nginx on `/`.
+The web UI does **not** need DuckDB. For offline bulk collect only:
+
+```bash
+cd /var/www/mysite/projects/Discovery
+source .venv/bin/activate
+python3 -m engine collect --yes
+```
+
+See `config.yaml` and `README.md`.
+
+---
+
+## Local dev vs VPS
+
+| | Local (Windows) | VPS |
+|--|-----------------|-----|
+| Run | `py -3 -m src.web_app` | systemd + uvicorn on 8765 |
+| URL | `http://127.0.0.1:8765` | `https://YOUR_DOMAIN/projects/discovery/` |
+| Subpath env | omit `DISCOVERY_BASE_PATH` | set in systemd |

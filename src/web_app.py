@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import os
 import time
 import webbrowser
 
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from .discovery_engine import ROOT, _default_model, analyze_posts, load_dotenv, load_json
@@ -25,6 +26,11 @@ from .web_discovery.discover import (
 API_VERSION = "2.1.0"
 STATIC_DIR = ROOT / "static"
 load_dotenv()
+
+# When behind nginx at e.g. /projects/discovery/, set DISCOVERY_BASE_PATH=/projects/discovery/
+_DISCOVERY_BASE_PATH = os.environ.get("DISCOVERY_BASE_PATH", "").strip()
+if _DISCOVERY_BASE_PATH and not _DISCOVERY_BASE_PATH.endswith("/"):
+    _DISCOVERY_BASE_PATH = f"{_DISCOVERY_BASE_PATH}/"
 
 app = FastAPI(title="Google Photos Discovery Engine", version=API_VERSION)
 
@@ -44,10 +50,13 @@ async def log_requests(request: Request, call_next):
 
 @app.get("/")
 def index():
-    return FileResponse(
-        STATIC_DIR / "index.html",
-        headers={"Cache-Control": "no-cache, must-revalidate"},
-    )
+    headers = {"Cache-Control": "no-cache, must-revalidate"}
+    if not _DISCOVERY_BASE_PATH:
+        return FileResponse(STATIC_DIR / "index.html", headers=headers)
+    html = (STATIC_DIR / "index.html").read_text(encoding="utf-8")
+    inject = f'    <base href="{_DISCOVERY_BASE_PATH}" />\n'
+    html = html.replace("<head>", f"<head>\n{inject}", 1)
+    return HTMLResponse(html, headers=headers)
 
 
 @app.get("/api/health")
@@ -65,8 +74,6 @@ def health():
 
 @app.get("/api/meta")
 def meta():
-    import os
-
     llm = active_provider_info()
     return {
         "version": API_VERSION,

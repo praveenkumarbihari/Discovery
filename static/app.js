@@ -102,7 +102,7 @@ function activeQueryInput() {
 }
 
 async function checkServerHealth() {
-  const res = await fetch("/api/health");
+  const res = await fetch("api/health");
   if (!res.ok) {
     throw new Error(
       "Server not running or outdated. Run: py -3 -m src.web_app"
@@ -127,7 +127,7 @@ function apiErrorMessage(res, body) {
 
 async function loadMeta() {
   await checkServerHealth();
-  const res = await fetch("/api/meta");
+  const res = await fetch("api/meta");
   if (!res.ok) throw new Error("Could not load app settings.");
   const meta = await res.json();
   sourcePresets = meta.source_presets || [];
@@ -139,7 +139,7 @@ async function loadMeta() {
 }
 
 async function loadResearchFramework() {
-  const res = await fetch("/api/research-questions");
+  const res = await fetch("api/research-questions");
   if (!res.ok) return;
   const data = await res.json();
   renderResearchFramework(data.catalog, data.suggested_searches || []);
@@ -312,7 +312,7 @@ async function discoverFromWeb(queryOverride) {
   const started = performance.now();
 
   try {
-    const res = await fetch("/api/discover", {
+    const res = await fetch("api/discover", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -373,7 +373,7 @@ async function runAnalysis() {
   refreshPostUrlMap();
 
   try {
-    const res = await fetch("/api/analyze", {
+    const res = await fetch("api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ entries, dry_run: false }),
